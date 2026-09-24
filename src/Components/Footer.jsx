@@ -1,7 +1,7 @@
 
 import { Link } from "react-router";
 import { FiGithub, FiMail } from "react-icons/fi";
-import logo from "../Assets/logo_v2.png";
+import logo from "../assets/logo_v2.png";
 
 export default function Footer() {
   const year = new Date().getFullYear();

@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { FiMenu, FiUser, FiLogOut } from "react-icons/fi";
-import logo from "../Assets/logo_v2.png";
+import logo from "../assets/logo_v2.png";
 
 export default function Navbar() {
   return (
