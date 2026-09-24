@@ -2,11 +2,16 @@ import { useState } from "react";
 
 import "./App.css";
 import Home from "./Pages/Home";
+import Navbar from "./Components/Navbar";
+import { Outlet } from "react-router";
+import Footer from "./Components/Footer";
 
 function App() {
   return (
     <>
-      <Home></Home>
+    <Navbar></Navbar>
+      <Outlet></Outlet>
+      <Footer></Footer>
     </>
   );
 }
