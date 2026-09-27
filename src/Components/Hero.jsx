@@ -5,7 +5,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="bg-base-100 px-2 py-8 md:py-18 w-full md:w-11/12 mx-auto lg:w-10/12 min-h-screen "
+      className="bg-base-100 px-2 py-8 md:py-24 w-full md:w-11/12 mx-auto lg:w-10/12 min-h-screen "
     >
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-10 md:flex-row md:gap-16">
         {/* Left: text */}
