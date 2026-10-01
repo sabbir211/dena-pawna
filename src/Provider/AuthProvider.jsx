@@ -1,44 +1,71 @@
 import React, { useEffect, useState } from "react";
-
+import { sendUserToDb } from "../Utils/sendUserToDb";
 import { createContext } from "react";
 import { auth } from "../Utils/firebase.config";
-import { createUserWithEmailAndPassword, GoogleAuthProvider, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, signOut, updateProfile } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+  updateProfile,
+} from "firebase/auth";
 
 export const AuthContext = createContext();
 
-const provider=new GoogleAuthProvider();
+const provider = new GoogleAuthProvider();
 export default function AuthProvider({ children }) {
-
+  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
 
 
-  function createUser(email, password,name) {
+
+  function createUser(email, password, name, phone) {
     setLoading(true);
     return createUserWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      const user = userCredential.user;
-      return updateProfile(user, {
-        displayName: name
-      }).then(() => {
+      .then(async (userCredential) => {
+        const user = userCredential.user;
+        await updateProfile(user, { displayName: name });
+
+        const token = await user.getIdToken();
+
+        try {
+          const data = await sendUserToDb(
+            token,
+            user.photoURL,
+            name,
+            user.email,
+            phone,
+          );
+          console.log("User sent to database:", data);
+        } catch (dbError) {
+          console.error("Failed to sync user to database:", dbError);
+          setError(
+            "Account created, but we couldn't finish setting up your profile. Please try logging in again.",
+          );
+        }
+
         setUser(user);
         setLoading(false);
-      }).catch((error) => {
-        console.error("Error updating profile:", error);
+        return user;
+      })
+      .catch((error) => {
+        console.error("Error creating user:", error);
+        setError(error.message);
         setLoading(false);
+        throw error;
       });
-    })
-    .catch((error) => {
-      console.error("Error creating user:", error);
-      setLoading(false);
-    });
   }
 
+
+
   function loginUser(email, password) {
-    return signInWithEmailAndPassword(auth, email, password)
+    return signInWithEmailAndPassword(auth, email, password);
   }
   function continueWithGoogle() {
-    setLoading(true)
+    setLoading(true);
     return signInWithPopup(auth, provider);
   }
 
@@ -71,7 +98,9 @@ export default function AuthProvider({ children }) {
     loading,
     setLoading,
     setUser,
-    continueWithGoogle
+    continueWithGoogle,
+    error,
+    setError,
   };
 
   return <AuthContext.Provider value={data}>{children}</AuthContext.Provider>;

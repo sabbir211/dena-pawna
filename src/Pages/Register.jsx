@@ -7,10 +7,9 @@ import { GrGoogle } from "react-icons/gr";
 import { useContext, useState } from "react";
 import { AuthContext } from "../Provider/AuthProvider";
 export default function Register() {
-  const { createUser, loading, setLoading, setUser, continueWithGoogle } =
+  const { createUser, loading, setLoading, setUser, continueWithGoogle ,error,setError} =
     useContext(AuthContext);
-  const [error, setError] = useState(null);
-
+  
   const location = useLocation();
   const navigate = useNavigate();
   const from = location.state?.from?.pathname || "/";
@@ -30,14 +29,20 @@ export default function Register() {
       setError("You must accept the terms and conditions!");
       return;
     }
+    setError(null);
 
     createUser(email, password, fullName)
       .then((result) => {
-        navigate(from, { replace: true });
+        console.log(result);
+        if (result) {
+          setLoading(false);
+          navigate(from, { replace: true });
+        }
       })
       .catch((error) => {
         console.log(error);
         setLoading(false);
+        
         setError(error.message);
       });
   }
