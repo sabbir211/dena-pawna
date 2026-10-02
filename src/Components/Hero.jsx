@@ -5,7 +5,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative w-full bg-base-100 px-2 py-14 md:w-11/12 md:py-24 lg:w-10/12 mx-auto mt-3.5"
+      className="relative w-full bg-base-100 px-2 py-14 md:w-11/12 md:py-24 lg:w-10/12 mx-auto mt-3.5 min-h-screen "
     >
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-16 md:flex-row md:gap-16">
         {/* Left: text */}
@@ -97,12 +97,7 @@ export default function Hero() {
         </div>
       </div>
 
-      <a
-        href="#how-it-works"
-        className="absolute bottom-4 left-1/2 -translate-x-1/2 animate-bounce text-base-content/50"
-      >
-        <FiArrowDown className="h-8 w-8 text-success" />
-      </a>
+     
     </section>
   );
 }

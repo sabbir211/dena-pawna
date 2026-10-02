@@ -20,8 +20,6 @@ export default function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
 
-
-
   function createUser(email, password, name, phone) {
     setLoading(true);
     return createUserWithEmailAndPassword(auth, email, password)
@@ -59,14 +57,49 @@ export default function AuthProvider({ children }) {
       });
   }
 
-
-
   function loginUser(email, password) {
-    return signInWithEmailAndPassword(auth, email, password);
+    setLoading(true);
+    return signInWithEmailAndPassword(auth, email, password).then(
+      async (userCredential) => {
+        try {
+          const token = await userCredential.user.getIdToken();
+          await sendUserToDb(
+            token,
+            userCredential.user.photoURL,
+            userCredential.user.displayName,
+            userCredential.user.email,
+            null,
+          );
+          setLoading(false);
+        } catch (error) {
+          console.error("Failed to sync user to database:", error);
+          setError(
+            "Account logged in, but we couldn't finish setting up your profile. Please try logging in again.",
+          );
+        }
+      },
+    );
   }
   function continueWithGoogle() {
     setLoading(true);
-    return signInWithPopup(auth, provider);
+    return signInWithPopup(auth, provider).then(async (userCredential) => {
+      try {
+        const token =await userCredential.user.getIdToken();
+        await sendUserToDb(
+          token,
+          userCredential.user.photoURL,
+          userCredential.user.displayName,
+          userCredential.user.email,
+          null,
+        );
+      } catch (error) {
+        console.error("Failed to sync user to database:", error);
+        setError(
+          "Account logged in, but we couldn't finish setting up your profile. Please try logging in again.",
+        );
+      }
+      setLoading(false);
+    });
   }
 
   useEffect(() => {
