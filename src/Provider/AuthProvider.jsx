@@ -63,6 +63,7 @@ export default function AuthProvider({ children }) {
       async (userCredential) => {
         try {
           const token = await userCredential.user.getIdToken();
+          console.log(token);
           await sendUserToDb(
             token,
             userCredential.user.photoURL,
