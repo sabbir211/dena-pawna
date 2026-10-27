@@ -55,7 +55,7 @@ function getStatus(person) {
   }
 
   // if (person.hasPending) return { label: "Awaiting confirmation", cls: "bg-warning/15 text-warning" };
-  // return { label: "Active", cls: "bg-success/10 text-success" };
+  return { label: "Active", cls: "bg-success/10 text-success" };
 }
 
 export default function BalanceRow({ person }) {
