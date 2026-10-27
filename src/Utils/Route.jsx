@@ -7,6 +7,7 @@ import Dashboard from "../Pages/Dashboard.jsx";
 import DashHome from "../Components/DashHome.jsx";
 import PairLedger from "../Components/PairLedger.jsx";
 import PrivateRoute from "../Components/PrivateRoute.jsx";
+import NotFound from "../Pages/NotFound.jsx";
 
 export const route = createBrowserRouter([
   {
@@ -40,5 +41,11 @@ export const route = createBrowserRouter([
         ],
       },
     ],
+  
   },
+  {
+    path: "*",
+    Component:NotFound,
+  }
+
 ]);
