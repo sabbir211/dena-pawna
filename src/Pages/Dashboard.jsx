@@ -1,7 +1,8 @@
 import { useContext, useState } from "react";
 import { Outlet } from "react-router";
-import AddTransactionModal from "../Components/AddTransactionModal.jsx";
+
 import { AuthContext } from "../Provider/AuthProvider";
+import TransactionModal from "../Components/TransactionModal";
 
 export default function Dashboard() {
   const { user } = useContext(AuthContext);
@@ -34,7 +35,7 @@ const openAddMoney = (person, direction) => {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 md:py-12">
       <Outlet context={{ openAddMoney, version }} />
-      <AddTransactionModal
+      <TransactionModal
         open={modalOpen}
         prefill={prefill}
         onClose={() => setModalOpen(false)}
