@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { Outlet } from "react-router";
-import AddTransactionModal from "../Components/AddTransactionModal";
+import AddTransactionModal from "../Components/AddTransactionModal.jsx";
 import { AuthContext } from "../Provider/AuthProvider";
 
 export default function Dashboard() {

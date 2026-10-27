@@ -45,14 +45,23 @@ export default function SingleLedger({
     fetch(
       `${import.meta.env.VITE_API_URL}/api/transactions/${entry._id}/confirm`,
       {
-        method: "POST",
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${await user.getIdToken()}`,
         },
         body: JSON.stringify({}),
       },
-    );
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Confirm response:", data);
+        if (!data.success) throw new Error(data.message || "Failed to confirm");
+        loadMore(1); // Reload the first page to reflect the change
+      })
+      .catch((err) => {
+        console.error("Error confirming entry:", err);
+      });
   };
 
   return (
