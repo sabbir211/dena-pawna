@@ -6,6 +6,7 @@ import Register from "../Pages/Register.jsx";
 import Dashboard from "../Pages/Dashboard.jsx";
 import DashHome from "../Components/DashHome.jsx";
 import PairLedger from "../Components/PairLedger.jsx";
+import PrivateRoute from "../Components/PrivateRoute.jsx";
 
 export const route = createBrowserRouter([
   {
@@ -15,30 +16,29 @@ export const route = createBrowserRouter([
       {
         index: true,
         Component: Home,
-      
       },
       {
         path: "/login",
-        Component:Login
+        Component: Login,
       },
       {
         path: "/register",
-        Component: Register
+        Component: Register,
       },
       {
         path: "/dashboard",
-        Component: Dashboard,
-        children:[
+        element: <PrivateRoute><Dashboard /></PrivateRoute>,
+        children: [
           {
-            index:true,
-            Component:DashHome
+            index: true,
+            Component: DashHome,
           },
           {
-            path:"ledger/:contactId",
-            Component:PairLedger
-          }
-        ]
-      }
+            path: "ledger/:contactId",
+            Component: PairLedger,
+          },
+        ],
+      },
     ],
   },
 ]);

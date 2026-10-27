@@ -72,29 +72,32 @@ export default function BalanceRow({ person }) {
   const ago = timeAgo(person.updatedAt);
   const dateText = dueText || (ago && `Last activity ${ago}`);
 const name = person.contactA.email === user.email ? person.contactB.name : person.contactA.name;
+const contactId = person.contactA.email === user.email ? person.contactB._id : person.contactA._id;
+
   return (
     <li>
       <Link
-        to={`/dashboard/ledger/${person.contactId}`}
-        className="group flex items-center gap-4 rounded-2xl border border-base-300 bg-base-100 p-4 shadow-sm transition hover:shadow-md sm:p-5"
+        to={`/dashboard/ledger/${contactId}`}
+        className="group flex items-center gap-2 md:gap-4 rounded-2xl border border-base-300 bg-base-100 p-4 shadow-sm transition hover:shadow-md sm:p-5"
       >
         {/* Avatar */}
         <div
-          className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-xl font-semibold ${tone.avatar}`}
+          className={`flex h-4 w-4 md:h-14 md:w-14 shrink-0 items-center justify-center rounded-full md:text-xl font-semibold ${tone.avatar}`}
         >
           {name.charAt(0).toUpperCase()}
         </div>
 
         {/* Name + status + date */}
         <div className="min-w-0 flex-1">
-          <p className="truncate text-lg font-semibold">{name}</p>
-          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
-            {/* <span
+          <p className="truncate md:text-lg font-semibold">{name}</p>
+          
+          <div className="mt-1.5 flex flex-wrap items-center md:gap-x-3 gap-y-1">
+            <span
               className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${status.cls}`}
             >
               <span className="h-2 w-2 rounded-full bg-current" />
               {status.label}
-            </span> */}
+            </span>
 
             {dateText && (
               <>
@@ -107,7 +110,7 @@ const name = person.contactA.email === user.email ? person.contactB.name : perso
 
         {/* Amount + who owes whom */}
         <div className="shrink-0 text-right">
-          <p className={`text-xl font-bold sm:text-2xl ${tone.amount}`}>
+          <p className={`text-xl font-bold md:text-2xl ${tone.amount}`}>
             {tone.sign}৳{Math.abs(person.netAmount).toLocaleString()}
           </p>
           <p className="text-sm text-base-content/60">{tone.label}</p>

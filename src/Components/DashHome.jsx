@@ -1,13 +1,15 @@
 import React, { use, useContext, useEffect, useState } from "react";
 import SummaryCards from "./SummaryCards";
 import { FiPlus, FiSearch } from "react-icons/fi";
-import AddTransactionModal from "./addTransactionModal";
+// import AddTransactionModal from "./addTransactionModal";
 import EmptyState from "./EmptyState";
 import BalanceRow from "./BalanceRow";
 import { AuthContext } from "../Provider/AuthProvider";
+import { useOutletContext } from "react-router";
 
 export default function DashHome() {
   const { user } = useContext(AuthContext);
+  const { openAddMoney, version } = useOutletContext();
   const [tab, setTab] = useState("owedToYou");
   const [modalOpen, setModalOpen] = useState(false);
   const [pairs, setPairs] = useState([]);
@@ -36,21 +38,23 @@ export default function DashHome() {
         .then((res) => res.json())
         .then((data) => {
           setPairs(data.pairs);
-          setLoading(false);
           console.log("My dena pawna list:", data);
         })
         .catch((err) => {
           console.error("Error fetching my dena pawna list:", err);
+        })
+        .finally(() => {
+          setLoading(false);
         });
     };
     if (user) {
       fetchMyDenaPawnaList();
     }
-  }, [user, reload]);
+  }, [user, version]);
 
 
   const classifyPair = (pair) => {
-    const userEmail = user?.email;
+    const userEmail = user?.email.toLowerCase();
     const isContactA = pair.contactA.email === userEmail;
     const isContactB = pair.contactB.email === userEmail;
 
@@ -78,34 +82,30 @@ export default function DashHome() {
   );
   const settledPairs = pairs?.filter((pair) => classifyPair(pair) === "settled");
 
-
-
-  console.log("iWillGetPairs", iWillGetPairs);
-  console.log("iHaveToGivePairs", iHaveToGivePairs);
-  const receivable = iWillGetPairs?.reduce((sum, p) => sum + p.netAmount, 0);
+  const receivable = iWillGetPairs?.reduce((sum, p) => sum + Math.abs(p.netAmount), 0);
   const payable = Math.abs(
-    iHaveToGivePairs?.reduce((sum, p) => sum + p.netAmount, 0),
+    iHaveToGivePairs?.reduce((sum, p) => sum + Math.abs(p.netAmount), 0),
   );
   const isEmpty = pairs?.length === 0;
 
-  const handleAddTransaction = async (data, proofFile) => {
-    const res = await fetch(`${API_BASE_URL}/api/transactions/create`, {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${await getToken()}`,
-      },
-    });
+  // const handleAddTransaction = async (data, proofFile) => {
+  //   const res = await fetch(`${API_BASE_URL}/api/transactions/create`, {
+  //     method: "POST",
+  //     body: JSON.stringify(data),
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       Authorization: `Bearer ${await getToken()}`,
+  //     },
+  //   });
 
-    const body = await res.json().catch((err) => ({}));
-    if (res.ok) {
-      setReload(!reload);
-    }
-    if (!res.ok) {
-      throw new Error(body.message || "Failed to add transaction");
-    }
-  };
+  //   const body = await res.json().catch((err) => ({}));
+  //   if (res.ok) {
+  //     setReload(!reload);
+  //   }
+  //   if (!res.ok) {
+  //     throw new Error(body.message || "Failed to add transaction");
+  //   }
+  // };
 
   if(loading){
     return (
@@ -128,17 +128,13 @@ export default function DashHome() {
           <input type="text" placeholder="Search contacts" className="grow" />
         </label>
         <button
-          onClick={() => setModalOpen(true)}
+          onClick={() => openAddMoney(null, null)}
           className="btn btn-primary gap-2 sm:w-fit"
         >
           <FiPlus /> Add Transaction
         </button>
       </div>
-      <AddTransactionModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onSubmit={handleAddTransaction}
-      />
+     
 
       {isEmpty ? (
         <div className="mt-10">

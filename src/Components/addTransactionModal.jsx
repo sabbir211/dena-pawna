@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState ,useEffect} from "react";
 import { FiX, FiArrowUpRight, FiArrowDownLeft, FiImage } from "react-icons/fi";
 
 const INITIAL = {
@@ -11,21 +11,25 @@ const INITIAL = {
   dueDate: "",
 };
 
-export default function AddTransactionModal({ open, onClose, onSubmit }) {
+
+export default function AddTransactionModal({ open, onClose, onSubmit,prefill }) {
   const [form, setForm] = useState(INITIAL);
   const [proofFile, setProofFile] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-
   const handleChange = (e) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-
+  
   const handleClose = () => {
     setForm(INITIAL);
     setProofFile(null);
     setError("");
     onClose();
   };
+  useEffect(() => {
+    if (open) setForm({ ...INITIAL, ...prefill });
+    console.log("prefill in AddTransactionModal:", prefill);
+  }, [open, prefill]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
