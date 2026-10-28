@@ -14,20 +14,20 @@ export default function DashHome() {
   const [modalOpen, setModalOpen] = useState(false);
   const [pairs, setPairs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [reload, setReload] = useState(false);
+  
 
   const API_BASE_URL = import.meta.env.VITE_API_URL;
   const getToken = async () => {
     if (user) {
       const token = await user.getIdToken();
-      setLoading(false);
+     
       return token;
     }
   };
 
   useEffect(() => {
     const fetchMyDenaPawnaList = async () => {
-      setLoading(true);
+      
       await fetch(`${API_BASE_URL}/api/transactions/my-dena-pawna-list`, {
         method: "GET",
         headers: {
@@ -88,24 +88,7 @@ export default function DashHome() {
   );
   const isEmpty = pairs?.length === 0;
 
-  // const handleAddTransaction = async (data, proofFile) => {
-  //   const res = await fetch(`${API_BASE_URL}/api/transactions/create`, {
-  //     method: "POST",
-  //     body: JSON.stringify(data),
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //       Authorization: `Bearer ${await getToken()}`,
-  //     },
-  //   });
-
-  //   const body = await res.json().catch((err) => ({}));
-  //   if (res.ok) {
-  //     setReload(!reload);
-  //   }
-  //   if (!res.ok) {
-  //     throw new Error(body.message || "Failed to add transaction");
-  //   }
-  // };
+ 
 
   if(loading){
     return (
