@@ -84,14 +84,14 @@ export default function TransactionModal({ open, onClose, onSubmit,prefill }) {
               onClick={() => setForm((p) => ({ ...p, direction: "give" }))}
               className={`btn gap-2 ${isGive ? "btn-error" : "btn-outline"}`}
             >
-              <FiArrowUpRight /> I gave money
+              <FiArrowUpRight /> Send Money
             </button>
             <button
               type="button"
               onClick={() => setForm((p) => ({ ...p, direction: "take" }))}
               className={`btn gap-2 ${!isGive ? "btn-success" : "btn-outline"}`}
             >
-              <FiArrowDownLeft /> I received money
+              <FiArrowDownLeft /> Receive Money
             </button>
           </div>
 

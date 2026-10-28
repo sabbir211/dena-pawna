@@ -6,6 +6,7 @@ import EmptyState from "./EmptyState";
 import BalanceRow from "./BalanceRow";
 import { AuthContext } from "../Provider/AuthProvider";
 import { useOutletContext } from "react-router";
+import Loader from "./Loader";
 
 export default function DashHome() {
   const { user } = useContext(AuthContext);
@@ -92,9 +93,7 @@ export default function DashHome() {
 
   if(loading){
     return (
-      <div className="flex items-center justify-center h-screen"> 
-        <span className="loading loading-spinner loading-lg"></span>
-      </div>
+     <Loader></Loader>
     );
   }
 

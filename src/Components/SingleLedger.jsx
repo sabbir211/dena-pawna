@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   FiArrowDownLeft,
   FiArrowUpRight,
@@ -34,14 +34,15 @@ const STATUS_CLS = {
 export default function SingleLedger({
   entries,
   pagination,
+  refreshPage,
   loadMore,
   loadingMore,
   moreError,
 }) {
   const { user } = useContext(AuthContext);
-
+  const [loading, setLoading] = useState(false);
   const onConfirm = async (entry) => {
-    console.log("Confirming entry:", entry);
+    setLoading(true);
     fetch(
       `${import.meta.env.VITE_API_URL}/api/transactions/${entry._id}/confirm`,
       {
@@ -54,13 +55,46 @@ export default function SingleLedger({
       },
     )
       .then((res) => res.json())
-      .then((data) => {
+      .then(async (data) => {
         console.log("Confirm response:", data);
         if (!data.success) throw new Error(data.message || "Failed to confirm");
-        loadMore(1); // Reload the first page to reflect the change
+        const entryIndex = entries.findIndex((item) => item._id === entry._id);
+        const pageSize = pagination.limit || entries.length || 1;
+        const entryPage = Math.floor(entryIndex / pageSize) + 1;
+        await refreshPage(entryPage);
+        setLoading(false);
       })
       .catch((err) => {
-        console.error("Error confirming entry:", err);
+        setLoading(false);
+        console.error("Error confirming transaction:", err);
+      });
+  };
+
+  const onCancel = async (entry) => {
+    setLoading(true);
+    fetch(
+      `${import.meta.env.VITE_API_URL}/api/transactions/${entry._id}/cancel`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${await user.getIdToken()}`,
+        },
+      },
+    )
+      .then((res) => res.json())
+      .then(async (data) => {
+        console.log("Cancel response:", data);
+        if (!data.success) throw new Error(data.message || "Failed to cancel");
+        const entryIndex = entries.findIndex((item) => item._id === entry._id);
+        const pageSize = pagination.limit || entries.length || 1;
+        const entryPage = Math.floor(entryIndex / pageSize) + 1;
+        await refreshPage(entryPage);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setLoading(false);
+        console.error("Error cancelling transaction:", err);
       });
   };
 
@@ -132,24 +166,33 @@ export default function SingleLedger({
                   {gave ? "+" : "−"}৳{e.amount.toLocaleString()}
                 </p>
                 <div className="flex w-16 shrink-0 justify-end gap-1">
-                  {e.status === "pending" && e.createdBy.email != user.email && (
-                    <>
-                      <button
-                        title="Confirm"
-                        onClick={() => onConfirm(e)}
-                        className="btn btn-ghost btn-xs btn-circle text-success"
-                      >
-                        <FiCheck className="h-4 w-4" />
-                      </button>
-                      <button
-                        title="Cancel"
-                        onClick={() => onCancel(e)}
-                        className="btn btn-ghost btn-xs btn-circle text-error"
-                      >
-                        <FiX className="h-4 w-4" />
-                      </button>
-                    </>
-                  )}
+                  {e.status === "pending" &&
+                    e.createdBy.email != user.email && (
+                      <>
+                        {loading ? (
+                          <span className="loading loading-spinner loading-sm" />
+                        ) : (
+                          <button
+                            title="Confirm"
+                            onClick={() => onConfirm(e)}
+                            className="btn btn-ghost btn-xs btn-circle text-success"
+                          >
+                            <FiCheck className="h-4 w-4" />
+                          </button>
+                        )}
+                        {loading ? (
+                          <span className="loading loading-spinner loading-sm" />
+                        ) : (
+                          <button
+                            title="Delete"
+                            onClick={() => onCancel(e)}
+                            className="btn btn-ghost btn-xs btn-circle text-error"
+                          >
+                            <FiX className="h-4 w-4" />
+                          </button>
+                        )}
+                      </>
+                    )}
                 </div>
               </li>
             );

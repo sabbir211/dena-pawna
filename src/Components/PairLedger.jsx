@@ -12,10 +12,10 @@ import {
 } from "react-icons/fi";
 import { AuthContext } from "../Provider/AuthProvider";
 import SingleLedger from "./SingleLedger";
+import Loader from "./Loader";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 const PAGE_SIZE = 10;
-
 
 const TONE = {
   positive: { text: "text-success", avatar: "bg-success/15 text-success" },
@@ -25,7 +25,6 @@ const TONE = {
     avatar: "bg-base-200 text-base-content/60",
   },
 };
-
 
 const tileCls =
   "flex w-full flex-col items-center gap-1 rounded-2xl border border-base-300 bg-base-100 p-5 text-center transition hover:border-primary/40 hover:bg-base-200/50";
@@ -72,6 +71,25 @@ export default function PairLedger() {
     return body;
   };
 
+  const refreshPage = async (page) => {
+    const json = await fetchPage(page);
+    const pageSize = json.pagination.limit || PAGE_SIZE;
+    const pageStart = (page - 1) * pageSize;
+    setPerson(json.person);
+    setEntries((previousEntries) => [
+      ...previousEntries.slice(0, pageStart),
+      ...json.entries,
+      ...previousEntries.slice(pageStart + pageSize),
+    ]);
+    setPagination((previousPagination) => ({
+      ...previousPagination,
+      totalCount: json.pagination.totalCount,
+      totalPages: json.pagination.totalPages,
+      hasMore:
+        previousPagination.currentPage * pageSize < json.pagination.totalCount,
+    }));
+  };
+
   // First page. Runs again when a transaction is added (version changes).
   useEffect(() => {
     if (!user) return;
@@ -112,11 +130,7 @@ export default function PairLedger() {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center py-20">
-        <span className="loading loading-spinner loading-lg" />
-      </div>
-    );
+    return <Loader></Loader>;
   }
   if (error || !person) {
     return (
@@ -173,9 +187,9 @@ export default function PairLedger() {
         </p>
         <p className="mt-1 text-sm text-base-content/60">
           {positive
-            ? `${firstName} owes you`
+            ? `You will get from ${firstName} `
             : negative
-              ? `You owe ${firstName}`
+              ? `You will pay to ${firstName}`
               : "All settled up"}
         </p>
       </div>
@@ -183,16 +197,16 @@ export default function PairLedger() {
       {/* Actions */}
       <div className="mt-6 grid grid-cols-2 gap-3">
         <ActionTile
-          icon={FiPlusCircle}
-          title="Add money"
-          subtitle="Record a new debt"
-          onClick={() => openAddMoney(person, negative ? "take" : "give")}
+          icon={FiArrowUpRight}
+          title="Send money"
+          subtitle={`Sent to ${firstName}`}
+          onClick={() => openAddMoney(person, "give")}
         />
         <ActionTile
-          icon={FiCreditCard}
-          title="Record payment"
-          subtitle="Update repayment"
-          onClick={() => openAddMoney(person, negative ? "give" : "take")}
+          icon={FiArrowDownLeft}
+          title="Receive money"
+          subtitle={`Got from ${firstName}`}
+          onClick={() => openAddMoney(person, "take")}
         />
 
         {positive && (
@@ -237,8 +251,14 @@ export default function PairLedger() {
       <div className="my-6 h-px bg-base-300" />
 
       {/* History */}
-      <SingleLedger entries={entries} pagination={pagination} loadMore={loadMore} loadingMore={loadingMore} moreError={moreError} />
-      
+      <SingleLedger
+        entries={entries}
+        pagination={pagination}
+        refreshPage={refreshPage}
+        loadMore={loadMore}
+        loadingMore={loadingMore}
+        moreError={moreError}
+      />
     </div>
   );
 }
