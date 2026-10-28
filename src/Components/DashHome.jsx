@@ -25,7 +25,7 @@ export default function DashHome() {
       return token;
     }
   };
-
+console.log("User in DashHome:");
   useEffect(() => {
     const fetchMyDenaPawnaList = async () => {
       
