@@ -28,7 +28,11 @@ export const route = createBrowserRouter([
       },
       {
         path: "/dashboard",
-        element: <PrivateRoute><Dashboard /></PrivateRoute>,
+        element: (
+          <PrivateRoute>
+            <Dashboard />
+          </PrivateRoute>
+        ),
         children: [
           {
             index: true,
@@ -40,12 +44,10 @@ export const route = createBrowserRouter([
           },
         ],
       },
+      {
+        path: "*",
+        Component: NotFound,
+      },
     ],
-  
   },
-  {
-    path: "*",
-    Component:NotFound,
-  }
-
 ]);
