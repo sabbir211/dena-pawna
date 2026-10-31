@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { FiChevronRight } from "react-icons/fi";
+import { FiBell, FiBellOff, FiChevronRight } from "react-icons/fi";
 import { AuthContext } from "../Provider/AuthProvider";
 import { useContext } from "react";
 
@@ -54,8 +54,14 @@ function getStatus(person) {
     return { label: `Due in ${days}d`, cls: "bg-info/10 text-info" };
   }
 
-  // if (person.hasPending) return { label: "Awaiting confirmation", cls: "bg-warning/15 text-warning" };
-  return { label: "Active", cls: "bg-success/10 text-success" };
+  if (person.settledOn) {
+    return {
+      label: `Settled ${fmtDate(person.settledOn)}`,
+      cls: "bg-success/10 text-success",
+    };
+  }
+
+  return { label: "No due date", cls: "bg-success/10 text-success" };
 }
 
 export default function BalanceRow({ person }) {
@@ -70,9 +76,17 @@ export default function BalanceRow({ person }) {
 
   const dueText = fmtDate(person.dueDate) && `Due ${fmtDate(person.dueDate)}`;
   const ago = timeAgo(person.updatedAt);
-  const dateText = dueText || (ago && `Last activity ${ago}`);
-const name = person.contactA.email === user.email ? person.contactB.name : person.contactA.name;
-const contactId = person.contactA.email === user.email ? person.contactB._id : person.contactA._id;
+  const dateText = person.settledOn
+    ? `Settled ${fmtDate(person.settledOn)}`
+    : dueText || (ago && `Updated ${ago}`);
+  const name =
+    person.contactA.email === user.email
+      ? person.contactB.name
+      : person.contactA.name;
+  const contactId =
+    person.contactA.email === user.email
+      ? person.contactB._id
+      : person.contactA._id;
 
   return (
     <li>
@@ -89,8 +103,11 @@ const contactId = person.contactA.email === user.email ? person.contactB._id : p
 
         {/* Name + status + date */}
         <div className="min-w-0 flex-1">
-          <p className="truncate md:text-lg font-semibold">{name}</p>
-          
+          <div className="flex  items-center justify-between">
+            <p className="truncate md:text-lg font-semibold">{name}</p>
+            
+          </div>
+
           <div className="mt-1.5 flex flex-wrap items-center md:gap-x-3 gap-y-1">
             <span
               className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${status.cls}`}
@@ -110,10 +127,18 @@ const contactId = person.contactA.email === user.email ? person.contactB._id : p
 
         {/* Amount + who owes whom */}
         <div className="shrink-0 text-right">
+          <p className="flex items-center justify-end gap-1 text-base-content/60">
+              {person.status === "active" && person.autoReminder ? (
+                <div><FiBell className="h-4 w-4 " /></div>
+              ) : (
+                <FiBellOff className="h-4 w-4 " />
+              )}
+            </p>
           <p className={`text-xl font-bold md:text-2xl ${tone.amount}`}>
-            {tone.sign}৳{Math.abs(person.netAmount).toLocaleString()}
+            {tone.sign}{Math.abs(person.netAmount).toLocaleString()}
           </p>
           <p className="text-sm text-base-content/60">{tone.label}</p>
+          
         </div>
 
         <FiChevronRight className="h-5 w-5 shrink-0 text-base-content/40 transition group-hover:translate-x-0.5 group-hover:text-primary" />

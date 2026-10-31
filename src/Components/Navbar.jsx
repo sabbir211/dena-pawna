@@ -31,8 +31,7 @@ export default function Navbar() {
           <div className="flex items-center gap-6">
             <ul className="menu menu-horizontal hidden gap-1 px-1 text-base lg:flex">
               <li><Link to="/dashboard">Dashboard</Link></li>
-              <li><Link to="/contacts">Contacts</Link></li>
-              <li><Link to="/transactions/new">Add</Link></li>
+          
             </ul>
 
             {loading ? (
@@ -98,8 +97,7 @@ export default function Navbar() {
             <img src={logo} alt="DenaPawna" className="h-auto w-46" />
           </li>
           <li><Link to="/dashboard">Dashboard</Link></li>
-          <li><Link to="/contacts">Contacts</Link></li>
-          <li><Link to="/transactions/new">Add</Link></li>
+          
 
           <div className="divider" />
 

@@ -129,7 +129,7 @@ export default function TransactionModal({ open, onClose, onSubmit,prefill }) {
             <label className="form-control w-full">
               <span className="label-text mb-1">Amount</span>
               <label className="input input-bordered flex items-center gap-2">
-                <span className="text-base-content/50">৳</span>
+                <span className="text-base-content/50"></span>
                 <input
                   type="number"
                   name="amount"

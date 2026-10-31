@@ -1,7 +1,10 @@
 import { Link } from "react-router";
 import { FiArrowDown, FiArrowRight, FiCheckCircle } from "react-icons/fi";
+import { AuthContext } from "../Provider/AuthProvider";
+import { useContext } from "react";
 
 export default function Hero() {
+  const {user}=useContext(AuthContext)
   return (
     <section
       id="home"
@@ -22,10 +25,17 @@ export default function Hero() {
           </p>
 
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row md:justify-start">
-            <Link to="/register" className="btn btn-primary btn-lg gap-2">
-              Get Started Free
-              <FiArrowRight />
-            </Link>
+            {user ? (
+              <Link to="/dashboard" className="btn btn-primary btn-lg gap-2">
+                Go to Dashboard
+                <FiArrowRight />
+              </Link>
+            ) : (
+              <Link to="/register" className="btn btn-primary btn-lg gap-2">
+                Get Started Free
+                <FiArrowRight />
+              </Link>
+            )}
             <a href="#how-it-works" className="btn btn-outline btn-lg">
               See How It Works
             </a>
@@ -38,7 +48,7 @@ export default function Hero() {
               <div className="text-sm">Free to use</div>
             </div>
             <div className="text-center md:text-left">
-              <div className="text-2xl font-bold text-base-content">৳</div>
+              <div className="text-2xl font-bold text-base-content"></div>
               <div className="text-sm">Built for BD, Taka-first</div>
             </div>
             <div className="text-center md:text-left">
@@ -60,12 +70,12 @@ export default function Hero() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="stat rounded-box bg-success/10 p-5">
                   <div className="stat-title">You'll receive</div>
-                  <div className="stat-value text-success text-3xl">৳4,200</div>
+                  <div className="stat-value text-success text-3xl">4,200</div>
                   <div className="stat-desc text-success/70">from 3 people</div>
                 </div>
                 <div className="stat rounded-box bg-error/10 p-5">
                   <div className="stat-title">You owe</div>
-                  <div className="stat-value text-error text-3xl">৳1,500</div>
+                  <div className="stat-value text-error text-3xl">1,500</div>
                   <div className="stat-desc text-error/70">to 1 person</div>
                 </div>
               </div>
@@ -73,15 +83,15 @@ export default function Hero() {
               <ul className="flex flex-col gap-2">
                 <li className="flex items-center justify-between rounded-box bg-base-200 px-4 py-3">
                   <span>Rahim</span>
-                  <span className="badge badge-success badge-outline">+৳3,000</span>
+                  <span className="badge badge-success badge-outline">+3,000</span>
                 </li>
                 <li className="flex items-center justify-between rounded-box bg-base-200 px-4 py-3">
                   <span>Karim</span>
-                  <span className="badge badge-error badge-outline">-৳1,500</span>
+                  <span className="badge badge-error badge-outline">-1,500</span>
                 </li>
                 <li className="flex items-center justify-between rounded-box bg-base-200 px-4 py-3">
                   <span>Lima</span>
-                  <span className="badge badge-success badge-outline">+৳1,200</span>
+                  <span className="badge badge-success badge-outline">+1,200</span>
                 </li>
               </ul>
             </div>
@@ -91,7 +101,7 @@ export default function Hero() {
           <div className="absolute -bottom-6 -left-6 hidden items-center gap-2 rounded-box border border-base-300 bg-base-100 px-4 py-3 shadow-lg md:flex">
             <FiCheckCircle className="h-5 w-5 text-success" />
             <span className="text-sm font-medium">
-              Rahim just settled ৳1,000
+              Rahim just settled 1,000
             </span>
           </div>
         </div>

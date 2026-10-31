@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Link, useParams, useOutletContext } from "react-router";
 import {
   FiArrowLeft,
@@ -9,10 +9,12 @@ import {
   FiMessageCircle,
   FiPhone,
   FiMail,
+  FiBell,
 } from "react-icons/fi";
 import { AuthContext } from "../Provider/AuthProvider";
 import SingleLedger from "./SingleLedger";
 import Loader from "./Loader";
+import ReminderSendModal from "./ReminderSendModal";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 const PAGE_SIZE = 10;
@@ -58,7 +60,9 @@ export default function PairLedger() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [moreError, setMoreError] = useState(false);
   const [error, setError] = useState("");
-
+  const [reminderLoding, setReminderLoading] = useState(false);
+ 
+  const modalRef = useRef(null);
   const fetchPage = async (page) => {
     const token = await user.getIdToken();
     const res = await fetch(
@@ -144,14 +148,73 @@ export default function PairLedger() {
   const tone = positive ? TONE.positive : negative ? TONE.negative : TONE.zero;
   const firstName = person.name.split(" ")[0];
 
+  const handleToggleReminder = async () => {
+    try {
+      setReminderLoading(true);
+      const token = await user.getIdToken();
+      const res = await fetch(
+        `${API_BASE_URL}/api/transactions/${contactId}/toggle-auto-reminder`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.message || `Server responded with ${res.status}`);
+      }
+      const updatedPerson = await res.json();
+      const updatedReminderStatus = updatedPerson.autoReminder;
+      // console.log(updatedPerson, updatedReminderStatus);
+      setPerson((prevPerson) => ({
+        ...prevPerson,
+        autoReminder: updatedReminderStatus,
+      }));
+      console.log(updatedPerson);
+    } catch (err) {
+      console.error("Error toggling auto reminder:", err);
+    } finally {
+      setReminderLoading(false);
+    }
+  };
+
   const mailto =
     `mailto:${person.email}` +
     `?subject=${encodeURIComponent("Payment reminder")}` +
     `&body=${encodeURIComponent(
-      `Hi ${firstName}, a friendly reminder that ৳${Math.abs(amount).toLocaleString()} is due. Thanks!`,
+      `Hi ${firstName}, a friendly reminder that ${Math.abs(amount).toLocaleString()} is due. Thanks!`,
     )}`;
 
-  console.log("entries in PairLedger:", entries);
+
+  const cardStyle = !person.autoReminder
+    ? "bg-white border-gray-200"
+    : "bg-indigo-50 border-indigo-100";
+
+  const iconStyle = !person.autoReminder ? "text-gray-400" : "text-indigo-600";
+
+  const dueDate = person.dueDate;
+  const daysLeft = dueDate
+    ? Math.ceil((new Date(dueDate) - new Date()) / (1000 * 60 * 60 * 24))
+    : null;
+
+  const badgeClass =
+    daysLeft === null
+      ? ""
+      : daysLeft < 0
+        ? "badge-error"
+        : daysLeft <= 3
+          ? "badge-warning"
+          : "badge-ghost";
+
+  const openReminderModal = () => {
+    modalRef.current.showModal();
+  };
+  const closeReminderModal = () => {
+    modalRef.current?.close();
+  };
 
   return (
     <div className="mx-auto  rounded-2xl border border-base-300 bg-base-100 p-5 sm:p-6">
@@ -163,35 +226,48 @@ export default function PairLedger() {
       </Link>
 
       {/* Profile */}
-      <div className="mt-5 flex items-center gap-4">
-        <div
-          className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-xl font-semibold ${tone.avatar}`}
-        >
-          {person.name.charAt(0).toUpperCase()}
-        </div>
-        <div className="min-w-0">
-          <h1 className="truncate text-lg font-semibold">{person.name}</h1>
-          <p className="text-sm text-base-content/60">
-            {amount === 0 ? "Settled" : "Active contact"}
-          </p>
-          <p>{person.email}</p>
-        </div>
-      </div>
+      <div className="mt-6 flex items-top justify-between gap-4">
+        <div>
+          <div className="mt-5 flex items-center gap-4">
+            <div
+              className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-xl font-semibold ${tone.avatar}`}
+            >
+              {person.name.charAt(0).toUpperCase()}
+            </div>
+            <div className="min-w-0">
+              <h1 className="truncate text-lg font-semibold">{person.name}</h1>
+              <p className="text-sm text-base-content/60">
+                {amount === 0 ? "Settled" : "Active contact"}
+              </p>
+              <p>{person.email}</p>
+            </div>
+          </div>
 
-      {/* Net balance */}
-      <div className="mt-6">
-        <p className="text-sm text-base-content/60">Net balance</p>
-        <p className={`mt-1 text-3xl font-bold ${tone.text}`}>
-          {positive ? "+" : negative ? "-" : ""}৳
-          {Math.abs(amount).toLocaleString()}
-        </p>
-        <p className="mt-1 text-sm text-base-content/60">
-          {positive
-            ? `You will get from ${firstName} `
-            : negative
-              ? `You will pay to ${firstName}`
-              : "All settled up"}
-        </p>
+          {/* Net balance */}
+          <div className="mt-6">
+            <p className="text-sm text-base-content/60">Net balance</p>
+            <p className={`mt-1 text-3xl font-bold ${tone.text}`}>
+              {positive ? "+" : negative ? "-" : ""}
+              {Math.abs(amount).toLocaleString()}
+            </p>
+            <p className="mt-1 text-sm text-base-content/60">
+              {positive
+                ? `You will get from ${firstName} `
+                : negative
+                  ? `You will pay to ${firstName}`
+                  : "All settled up"}
+            </p>
+          </div>
+          <div>
+            {dueDate && (
+              <span className={`badge badge-sm ${badgeClass} ml-2`}>
+                {daysLeft < 0
+                  ? `Overdue by ${Math.abs(daysLeft)}d`
+                  : `Due ${new Date(dueDate).toLocaleDateString("en-GB", { day: "numeric", month: "short" })} · in ${daysLeft}d`}
+              </span>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Actions */}
@@ -210,29 +286,40 @@ export default function PairLedger() {
         />
 
         {positive && (
-          <div className="dropdown w-full">
-            <ActionTile
-              as="div"
-              tabIndex={0}
-              role="button"
-              icon={FiMessageCircle}
-              title="Remind"
-              subtitle="Send a reminder"
+          <>
+            <div className="dropdown w-full">
+              <ActionTile
+                as="div"
+                tabIndex={0}
+                role="button"
+                icon={FiMessageCircle}
+                title="Remind"
+                subtitle="Send a reminder"
+              />
+              <ul
+                tabIndex={0}
+                className="menu dropdown-content z-10 mt-2 w-full rounded-box border border-base-300 bg-base-100 p-2 shadow-lg"
+              >
+                <li>
+                  <button
+                    onClick={openReminderModal}
+                    className="flex items-center gap-2"
+                  >
+                    <FiMail /> Email
+                  </button>
+                </li>
+                <li className="menu-disabled">
+                  <span>SMS · Coming soon</span>
+                </li>
+              </ul>
+            </div>
+            <ReminderSendModal
+              modalRef={modalRef}
+              onClose={closeReminderModal}
+              contactId={contactId}
+              person={person}
             />
-            <ul
-              tabIndex={0}
-              className="menu dropdown-content z-10 mt-2 w-full rounded-box border border-base-300 bg-base-100 p-2 shadow-lg"
-            >
-              <li>
-                <a href={mailto}>
-                  <FiMail /> Email
-                </a>
-              </li>
-              <li className="menu-disabled">
-                <span>SMS · Coming soon</span>
-              </li>
-            </ul>
-          </div>
+          </>
         )}
 
         <ActionTile
@@ -246,6 +333,35 @@ export default function PairLedger() {
             !positive ? "col-span-2" : ""
           }`}
         />
+      </div>
+      <div
+        className={`flex items-center justify-between rounded-2xl border px-5 py-4 ${cardStyle}`}
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-xl">
+            <FiBell className={`h-5 w-5 ${iconStyle}`} />
+          </span>
+          <div>
+            <p className="font-semibold text-sm">Auto reminder</p>
+            <p className="text-xs text-gray-500">
+              Reminders will be sent automatically on due dates 8 am in the
+              morning.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          {reminderLoding ? (
+            <span className="loading loading-spinner loading-sm"></span>
+          ) : (
+            <input
+              type="checkbox"
+              className="toggle toggle-sm toggle-primary"
+              checked={person.autoReminder}
+              onChange={handleToggleReminder}
+            ></input>
+          )}
+        </div>
       </div>
 
       <div className="my-6 h-px bg-base-300" />

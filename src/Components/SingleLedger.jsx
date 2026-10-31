@@ -163,7 +163,7 @@ export default function SingleLedger({
                         : ""
                   }`}
                 >
-                  {gave ? "+" : "−"}৳{e.amount.toLocaleString()}
+                  {gave ? "+" : "−"}{e.amount.toLocaleString()}
                 </p>
                 <div className="flex w-16 shrink-0 justify-end gap-1">
                   {e.status === "pending" &&
