@@ -23,7 +23,7 @@ const from = location.state?.from?.pathname || "/";
         navigate(from, { replace: true });
       })
       .catch((error) => {
-        console.log(error);
+        // console.log(error);
         setLoading(false);
         setError(error.message);
       }); 

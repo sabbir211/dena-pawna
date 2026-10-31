@@ -3,6 +3,7 @@ import { Outlet } from "react-router";
 
 import { AuthContext } from "../Provider/AuthProvider";
 import TransactionModal from "../Components/TransactionModal";
+import UploadImage from "../Utils/UploadImage";
 
 export default function Dashboard() {
   const { user, loading } = useContext(AuthContext);
@@ -10,7 +11,6 @@ export default function Dashboard() {
   const [prefill, setPrefill] = useState(null);
   const [version, setVersion] = useState(0);
   const [modalKey, setModalKey] = useState(0);
-  console.log("prefill in Dashboard:", prefill);
   const openAddMoney = (person, direction) => {
     setPrefill(
       person
@@ -26,6 +26,17 @@ export default function Dashboard() {
   };
   const handleAddTransaction = async (data, proofFile) => {
     const token = await user.getIdToken();
+
+    const url = proofFile
+      ? await UploadImage(proofFile, token, "proofs")
+      : null;
+    if (url) {
+      data.proofImage = {
+        url: url.url,
+        publicId: url.publicId,
+      };
+      
+    }
     const res = await fetch(
       `${import.meta.env.VITE_API_URL}/api/transactions/create`,
       {
@@ -39,7 +50,7 @@ export default function Dashboard() {
     );
     const body = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(body.message || "Failed to add transaction");
-    setVersion((v) => v + 1); // tells the active page to reload
+    setVersion((v) => v + 1);
   };
   if (loading) {
     return (

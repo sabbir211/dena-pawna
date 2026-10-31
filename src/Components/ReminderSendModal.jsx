@@ -48,10 +48,10 @@ export default function ReminderSendModal({ modalRef, onClose, contactId, person
         throw new Error("Failed to send reminder email");
       }
       toast.success("Reminder email sent successfully!");
-      console.log("Reminder email sent successfully:", info);
+      
       handleClose();
     } catch (error) {
-      console.error("Error sending reminder email:", error);
+      // console.error("Error sending reminder email:", error);
       setErrorSending(
         error.message || "An error occurred while sending the reminder email.",
       );

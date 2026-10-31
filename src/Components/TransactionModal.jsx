@@ -29,7 +29,7 @@ export default function TransactionModal({ open, onClose, onSubmit,prefill }) {
   };
   useEffect(() => {
     if (open) setForm({ ...INITIAL, ...prefill });
-    console.log("prefill in AddTransactionModal:", prefill);
+    // console.log("prefill in AddTransactionModal:", prefill);
   }, [open, prefill]);
 
   const handleSubmit = async (e) => {

@@ -173,9 +173,9 @@ export default function PairLedger() {
         ...prevPerson,
         autoReminder: updatedReminderStatus,
       }));
-      console.log(updatedPerson);
+      // console.log(updatedPerson);
     } catch (err) {
-      console.error("Error toggling auto reminder:", err);
+      // console.error("Error toggling auto reminder:", err);
     } finally {
       setReminderLoading(false);
     }

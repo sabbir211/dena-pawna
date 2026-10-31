@@ -56,7 +56,7 @@ export default function SingleLedger({
     )
       .then((res) => res.json())
       .then(async (data) => {
-        console.log("Confirm response:", data);
+        // console.log("Confirm response:", data);
         if (!data.success) throw new Error(data.message || "Failed to confirm");
         const entryIndex = entries.findIndex((item) => item._id === entry._id);
         const pageSize = pagination.limit || entries.length || 1;
@@ -66,7 +66,7 @@ export default function SingleLedger({
       })
       .catch((err) => {
         setLoading(false);
-        console.error("Error confirming transaction:", err);
+        // console.error("Error confirming transaction:", err);
       });
   };
 
@@ -94,7 +94,7 @@ export default function SingleLedger({
       })
       .catch((err) => {
         setLoading(false);
-        console.error("Error cancelling transaction:", err);
+        // console.error("Error cancelling transaction:", err);
       });
   };
 

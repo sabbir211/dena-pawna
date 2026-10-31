@@ -33,14 +33,14 @@ export default function Register() {
 
     createUser(email, password, fullName)
       .then((result) => {
-        console.log(result);
+        // console.log(result);
         if (result) {
           setLoading(false);
           navigate(from, { replace: true });
         }
       })
       .catch((error) => {
-        console.log(error);
+        // console.log(error);
         setLoading(false);
         
         setError(error.message);

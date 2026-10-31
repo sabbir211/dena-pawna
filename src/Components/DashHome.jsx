@@ -25,7 +25,7 @@ export default function DashHome() {
       return token;
     }
   };
-console.log("User in DashHome:");
+
   useEffect(() => {
     const fetchMyDenaPawnaList = async () => {
       
@@ -39,10 +39,10 @@ console.log("User in DashHome:");
         .then((res) => res.json())
         .then((data) => {
           setPairs(data.pairs);
-          console.log("My dena pawna list:", data);
+          
         })
         .catch((err) => {
-          console.error("Error fetching my dena pawna list:", err);
+          
         })
         .finally(() => {
           setLoading(false);

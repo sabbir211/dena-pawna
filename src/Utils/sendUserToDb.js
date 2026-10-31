@@ -14,7 +14,7 @@ const sendUserToDb = async (accessToken, photoUrl, name, email, phone) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Error sending user to database:", error);
+    // console.error("Error sending user to database:", error);
     throw error;
   }
 };

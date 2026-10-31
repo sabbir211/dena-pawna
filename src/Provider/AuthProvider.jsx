@@ -37,9 +37,9 @@ export default function AuthProvider({ children }) {
             user.email,
             phone,
           );
-          console.log("User sent to database:", data);
+          // console.log("User sent to database:", data);
         } catch (dbError) {
-          console.error("Failed to sync user to database:", dbError);
+          // console.error("Failed to sync user to database:", dbError);
           setError(
             "Account created, but we couldn't finish setting up your profile. Please try logging in again.",
           );
@@ -50,7 +50,7 @@ export default function AuthProvider({ children }) {
         return user;
       })
       .catch((error) => {
-        console.error("Error creating user:", error);
+        // console.error("Error creating user:", error);
         setError(error.message);
         setLoading(false);
         throw error;
@@ -63,7 +63,7 @@ export default function AuthProvider({ children }) {
       async (userCredential) => {
         try {
           const token = await userCredential.user.getIdToken();
-          console.log(token);
+
           await sendUserToDb(
             token,
             userCredential.user.photoURL,
@@ -73,7 +73,7 @@ export default function AuthProvider({ children }) {
           );
           setLoading(false);
         } catch (error) {
-          console.error("Failed to sync user to database:", error);
+          // console.error("Failed to sync user to database:", error);
           setError(
             "Account logged in, but we couldn't finish setting up your profile. Please try logging in again.",
           );
@@ -94,7 +94,7 @@ export default function AuthProvider({ children }) {
           null,
         );
       } catch (error) {
-        console.error("Failed to sync user to database:", error);
+        // console.error("Failed to sync user to database:", error);
         setError(
           "Account logged in, but we couldn't finish setting up your profile. Please try logging in again.",
         );
@@ -105,7 +105,7 @@ export default function AuthProvider({ children }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      console.log("Auth state changed. Current user:", currentUser);
+      // console.log("Auth state changed. Current user:", currentUser);
       setUser(currentUser);
       setLoading(false);
     });
@@ -120,7 +120,7 @@ export default function AuthProvider({ children }) {
         alert("Log out successful");
       })
       .catch(() => {
-        console.log("Failed to sign out");
+        // console.log("Failed to sign out");
       });
   }
 
