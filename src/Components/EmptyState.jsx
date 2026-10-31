@@ -8,9 +8,7 @@ export default function EmptyState() {
       <p className="text-sm text-base-content/70">
         Add your first transaction to start seeing who owes who.
       </p>
-      <Link to="/transactions/new" className="btn btn-primary btn-sm mt-2 gap-2">
-        <FiPlus /> Add Transaction
-      </Link>
+      
     </div>
   );
 }

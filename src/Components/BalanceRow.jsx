@@ -66,12 +66,16 @@ function getStatus(person) {
 
 export default function BalanceRow({ person }) {
   const { user } = useContext(AuthContext);
+
+  const myEmail = user?.email?.toLowerCase();
+  const iAmA = person.contactA.email?.toLowerCase() === myEmail;
+  const other = iAmA ? person.contactB : person.contactA;
+
+  // netAmount is stored from contactA's point of view; flip it when I'm contactB
+  const myAmount = iAmA ? person.netAmount : -person.netAmount;
+
   const tone =
-    person.netAmount > 0
-      ? TONE.positive
-      : person.netAmount < 0
-        ? TONE.negative
-        : TONE.zero;
+    myAmount > 0 ? TONE.positive : myAmount < 0 ? TONE.negative : TONE.zero;
   const status = getStatus(person);
 
   const dueText = fmtDate(person.dueDate) && `Due ${fmtDate(person.dueDate)}`;
@@ -79,14 +83,9 @@ export default function BalanceRow({ person }) {
   const dateText = person.settledOn
     ? `Settled ${fmtDate(person.settledOn)}`
     : dueText || (ago && `Updated ${ago}`);
-  const name =
-    person.contactA.email === user.email
-      ? person.contactB.name
-      : person.contactA.name;
-  const contactId =
-    person.contactA.email === user.email
-      ? person.contactB._id
-      : person.contactA._id;
+
+  const name = other.name;
+  const contactId = other._id;
 
   return (
     <li>
@@ -105,7 +104,6 @@ export default function BalanceRow({ person }) {
         <div className="min-w-0 flex-1">
           <div className="flex  items-center justify-between">
             <p className="truncate md:text-lg font-semibold">{name}</p>
-            
           </div>
 
           <div className="mt-1.5 flex flex-wrap items-center md:gap-x-3 gap-y-1">
@@ -128,17 +126,19 @@ export default function BalanceRow({ person }) {
         {/* Amount + who owes whom */}
         <div className="shrink-0 text-right">
           <p className="flex items-center justify-end gap-1 text-base-content/60">
-              {person.status === "active" && person.autoReminder ? (
-                <div><FiBell className="h-4 w-4 " /></div>
-              ) : (
-                <FiBellOff className="h-4 w-4 " />
-              )}
-            </p>
+            {person.status === "active" && person.autoReminder ? (
+              <div>
+                <FiBell className="h-4 w-4 " />
+              </div>
+            ) : (
+              <FiBellOff className="h-4 w-4 " />
+            )}
+          </p>
           <p className={`text-xl font-bold md:text-2xl ${tone.amount}`}>
-            {tone.sign}{Math.abs(person.netAmount).toLocaleString()}
+            {tone.sign}
+            {Math.abs(person.netAmount).toLocaleString()}
           </p>
           <p className="text-sm text-base-content/60">{tone.label}</p>
-          
         </div>
 
         <FiChevronRight className="h-5 w-5 shrink-0 text-base-content/40 transition group-hover:translate-x-0.5 group-hover:text-primary" />
