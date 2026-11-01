@@ -10,10 +10,10 @@ import Loader from "./Loader";
 
 export default function DashHome() {
   const { user } = useContext(AuthContext);
-  const { openAddMoney, version } = useOutletContext();
+  const { openAddMoney, version, pairs, refreshPairs } = useOutletContext();
   const [tab, setTab] = useState("owedToYou");
   const [modalOpen, setModalOpen] = useState(false);
-  const [pairs, setPairs] = useState([]);
+  // const [pairs, setPairs] = useState([]);
   const [loading, setLoading] = useState(true);
   
 
@@ -25,34 +25,19 @@ export default function DashHome() {
       return token;
     }
   };
+useEffect(() => {
+  if (pairs !== null) 
+    refreshPairs();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
 
-  useEffect(() => {
-    const fetchMyDenaPawnaList = async () => {
-      
-      await fetch(`${API_BASE_URL}/api/transactions/my-dena-pawna-list`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${await getToken()}`,
-        },
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          setPairs(data.pairs);
-          
-        })
-        .catch((err) => {
-          
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    };
-    if (user) {
-      fetchMyDenaPawnaList();
-    }
-  }, [user, version]);
-
+if (pairs === null) {
+  return (
+    <div className="flex h-screen items-center justify-center">
+      <span className="loading loading-spinner loading-lg"></span>
+    </div>
+  );
+}
 
   const classifyPair = (pair) => {
     const userEmail = user?.email.toLowerCase();
@@ -90,12 +75,6 @@ export default function DashHome() {
   const isEmpty = pairs?.length === 0;
 
  
-
-  if(loading){
-    return (
-     <Loader></Loader>
-    );
-  }
 
   return (
     <div>

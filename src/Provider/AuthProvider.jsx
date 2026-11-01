@@ -6,6 +6,7 @@ import {
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
   onAuthStateChanged,
+  reload,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
@@ -19,6 +20,25 @@ export default function AuthProvider({ children }) {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [dbUser, setDbUser] = useState(null);
+
+  async function getDatabaseProfile(firebaseUser) {
+    const token = await firebaseUser.getIdToken();
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/user/profile`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || "Unable to load your profile.");
+    }
+
+    const data = await response.json();
+    return data.user;
+  }
 
   function createUser(email, password, name, phone) {
     setLoading(true);
@@ -99,15 +119,69 @@ export default function AuthProvider({ children }) {
           "Account logged in, but we couldn't finish setting up your profile. Please try logging in again.",
         );
       }
+
       setLoading(false);
     });
   }
 
+  async function updateUserProfile(profile) {
+    if (!auth.currentUser) {
+      throw new Error("You must be logged in to update your profile.");
+    }
+
+    const firebaseProfile = {
+      displayName: profile.displayName,
+      photoURL: profile.photoURL,
+    };
+    await updateProfile(auth.currentUser, firebaseProfile);
+    await reload(auth.currentUser);
+    setUser(auth.currentUser);
+
+    const token = await auth.currentUser.getIdToken();
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/user/profile`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: profile.displayName,
+          phone: profile.phone,
+          photoUrl: profile.photoURL,
+        }),
+      },
+    );
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || "Unable to update your profile.");
+    }
+
+    const data = await response.json();
+    setDbUser(data.user);
+    return { firebaseUser: auth.currentUser, databaseUser: data.user };
+  }
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      // console.log("Auth state changed. Current user:", currentUser);
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
-      setLoading(false);
+
+      if (!currentUser) {
+        setDbUser(null);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setDbUser(await getDatabaseProfile(currentUser));
+      } catch (profileError) {
+        setDbUser(null);
+        setError(profileError.message);
+      } finally {
+        setLoading(false);
+      }
     });
     return () => {
       unsubscribe();
@@ -126,6 +200,7 @@ export default function AuthProvider({ children }) {
 
   const data = {
     user,
+    dbUser,
     createUser,
     loginUser,
     LogOut,
@@ -133,6 +208,7 @@ export default function AuthProvider({ children }) {
     setLoading,
     setUser,
     continueWithGoogle,
+    updateUserProfile,
     error,
     setError,
   };

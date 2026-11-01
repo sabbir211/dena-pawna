@@ -51,7 +51,7 @@ function ActionTile({
 export default function PairLedger() {
   const { contactId } = useParams();
   const { openAddMoney, version } = useOutletContext();
-  const { user } = useContext(AuthContext);
+  const { user,dbUser } = useContext(AuthContext);
 
   const [person, setPerson] = useState(null);
   const [entries, setEntries] = useState([]);
@@ -62,6 +62,8 @@ export default function PairLedger() {
   const [error, setError] = useState("");
   const [reminderLoding, setReminderLoading] = useState(false);
  
+
+
   const modalRef = useRef(null);
   const fetchPage = async (page) => {
     const token = await user.getIdToken();

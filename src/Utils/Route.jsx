@@ -8,6 +8,7 @@ import DashHome from "../Components/DashHome.jsx";
 import PairLedger from "../Components/PairLedger.jsx";
 import PrivateRoute from "../Components/PrivateRoute.jsx";
 import NotFound from "../Pages/NotFound.jsx";
+import Profile from "../Pages/Profile.jsx";
 
 export const route = createBrowserRouter([
   {
@@ -25,6 +26,14 @@ export const route = createBrowserRouter([
       {
         path: "/register",
         Component: Register,
+      },
+      {
+        path: "/profile",
+        element: (
+          <PrivateRoute>
+            <Profile />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/dashboard",
