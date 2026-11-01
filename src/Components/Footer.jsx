@@ -29,7 +29,7 @@ export default function Footer() {
             <FiGithub className="h-4 w-4" />
           </a>
           <a
-            href="mailto:contact@denapawna.com"
+            href="denapawna.app@gmail.com"
             className="btn btn-circle btn-ghost btn-sm"
             aria-label="Email"
           >
@@ -39,7 +39,9 @@ export default function Footer() {
       </div>
 
       <div className="mt-8 border-t border-base-300 pt-6 text-center text-xs text-base-content/50">
-        © {year} DenaPawna. All rights reserved.
+        © {year} DenaPawna. All rights reserved. Developed and maintained by <a href="https://www.pial.me" target="_blank" rel="noreferrer" className="link link-hover underline" >Sabbir Alam Pial </a>.
+        <br />
+        This is a free and open-source project.
       </div>
     </footer>
   );

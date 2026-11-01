@@ -276,13 +276,13 @@ export default function PairLedger() {
       <div className="mt-6 grid grid-cols-2 gap-3">
         <ActionTile
           icon={FiArrowUpRight}
-          title="Send money"
+          title="Sent money"
           subtitle={`Sent to ${firstName}`}
           onClick={() => openAddMoney(person, "give")}
         />
         <ActionTile
           icon={FiArrowDownLeft}
-          title="Receive money"
+          title="Received money"
           subtitle={`Got from ${firstName}`}
           onClick={() => openAddMoney(person, "take")}
         />

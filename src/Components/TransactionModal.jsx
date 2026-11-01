@@ -82,18 +82,20 @@ export default function TransactionModal({ open, onClose, onSubmit,prefill }) {
             <button
               type="button"
               onClick={() => setForm((p) => ({ ...p, direction: "give" }))}
-              className={`btn gap-2 ${isGive ? "btn-error" : "btn-outline"}`}
+              className={`btn gap-1 ${isGive ? "btn-success" : "btn-outline"}`}
             >
-              <FiArrowUpRight /> Send Money
+              <FiArrowUpRight /> Sent Money
             </button>
             <button
               type="button"
               onClick={() => setForm((p) => ({ ...p, direction: "take" }))}
-              className={`btn gap-2 ${!isGive ? "btn-success" : "btn-outline"}`}
+              className={`btn gap-1 ${!isGive ? "btn-error" : "btn-outline"}`}
             >
-              <FiArrowDownLeft /> Receive Money
+              <FiArrowDownLeft /> Received Money
             </button>
           </div>
+          <small className={`${isGive ? "block" : "hidden"} text-sm text-gray-400`}> 'Sent Money' means you gave money to this person.</small>
+          <small className={`${isGive ? "hidden" : "block"} text-sm text-gray-400`}> 'Received Money' means you took money from this person.</small>
 
           {/* Contact */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

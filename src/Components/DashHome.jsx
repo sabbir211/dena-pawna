@@ -109,13 +109,13 @@ if (pairs === null) {
               className={`tab ${tab === "owedToYou" ? "tab-active" : ""}`}
               onClick={() => setTab("owedToYou")}
             >
-              They owe me
+               I will get money from
             </button>
             <button
               className={`tab ${tab === "youOwe" ? "tab-active" : ""}`}
               onClick={() => setTab("youOwe")}
             >
-              I owe them
+              I took money from
             </button>
           </div>
 
